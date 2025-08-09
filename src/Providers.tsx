@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
-import { ConfigProvider, theme, Empty } from 'antd';
+import { ConfigProvider, theme, Empty, App as AntApp } from 'antd';
 import { router } from './router';
 
 const queryClient = new QueryClient();
@@ -96,6 +96,11 @@ const configTheme = {
     Card: {
       headerBg: catppuccinColors.surface1,
     },
+    Message: {
+      colorText: catppuccinColors.text,
+      contentBg: catppuccinColors.surface0,
+      colorTextLightSolid: catppuccinColors.text,
+    },
   },
 } as const;
 
@@ -108,7 +113,9 @@ export function Providers() {
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Data" />
         )}
       >
-        <RouterProvider router={router} />
+        <AntApp>
+          <RouterProvider router={router} />
+        </AntApp>
       </ConfigProvider>
     </QueryClientProvider>
   );

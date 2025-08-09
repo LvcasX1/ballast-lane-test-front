@@ -64,6 +64,41 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Ant Design Message theming (Catppuccin Mocha) */
+.ant-message {
+  z-index: 10000; /* keep above common UI */
+}
+.ant-message-notice .ant-message-notice-content {
+  background: linear-gradient(180deg, rgba(17, 17, 27, 0.85) 0%, rgba(49, 50, 68, 0.88) 100%);
+  color: #dbe0f5; /* subtle but legible */
+  border: 1px solid #3a3d52;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+/* Icon colors per status */
+.ant-message-success .anticon { color: #a6e3a1; } /* green */
+.ant-message-warning .anticon { color: #f9e2af; } /* yellow */
+.ant-message-error .anticon { color: #f38ba8; } /* red */
+.ant-message-info .anticon { color: #89b4fa; } /* blue */
+.ant-message-loading .anticon { color: #89dceb; } /* sky */
+/* Stronger text contrast inside custom content wrapper */
+.ant-message-custom-content,
+.ant-message-notice .ant-message-notice-content .ant-message-custom-content,
+.ant-message-notice .ant-message-notice-content .ant-message-custom-content span {
+  color: #dbe0f5;
+}
+
+/* Strong override to ensure AntD Message uses dark gradient background */
+.ant-message.ant-message .ant-message-notice .ant-message-notice-content {
+  background: linear-gradient(180deg, rgba(17, 17, 27, 0.9) 0%, rgba(49, 50, 68, 0.92) 100%) !important;
+  color: #e0e6fb !important;
+  border: 1px solid #3a3d52 !important;
+}
+.ant-message.ant-message .ant-message-custom-content,
+.ant-message.ant-message .ant-message-custom-content span {
+  color: #e0e6fb !important;
+}
+
 /* Keep the light-mode override in case user forces it */
 @media (prefers-color-scheme: light) {
   :root {
