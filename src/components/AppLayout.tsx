@@ -4,6 +4,7 @@ import { HomeOutlined, MenuOutlined, LogoutOutlined, LoginOutlined, BookOutlined
 import { useNavigate } from 'react-router-dom';
 import { isLoggedIn, subscribe, logout } from '../utils/auth';
 import { useLogout } from '../features/login/useCases/useLogout';
+import { Pressable } from './Animated';
 
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
@@ -34,7 +35,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       message.warning(e?.message || 'Server logout failed. Cleared session locally.');
     } finally {
       logout();
-      navigate('/');
+      window.location.href = '/';
     }
   };
 
@@ -76,18 +77,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     </div>
   );
 
-  const drawerLinkStyle: React.CSSProperties = {
-    fontSize: 18,
-    fontWeight: 700,
-    background: 'linear-gradient(45deg, #cba6f7, #89b4fa)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    textDecoration: 'none',
-    display: 'block',
-    padding: '8px 0',
-  };
-
+  // Removed old drawerLinkStyle in favor of styled items
   const drawerCloseStyle: React.CSSProperties = {
     fontSize: 20,
     fontWeight: 800,
@@ -98,6 +88,35 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     backgroundClip: 'text',
     display: 'inline-block',
   };
+
+  const DrawerItem: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }> = ({ icon, label, onClick, danger }) => (
+    <Pressable
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '12px 14px',
+        borderRadius: 12,
+        background: 'rgba(49, 50, 68, 0.6)',
+        border: `1px solid ${danger ? 'rgba(243, 139, 168, 0.35)' : 'rgba(203, 166, 247, 0.25)'}`,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.25)'
+      }}
+    >
+      <span style={{ color: danger ? '#f38ba8' : '#cba6f7', fontSize: 18, display: 'flex' }}>{icon}</span>
+      <span
+        style={{
+          fontWeight: 700,
+          background: danger ? 'linear-gradient(45deg, #f38ba8, #eba0ac)' : 'linear-gradient(45deg, #cba6f7, #89b4fa)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}
+      >
+        {label}
+      </span>
+    </Pressable>
+  );
 
   return (
     <Layout style={{ minHeight: '100dvh', background: 'transparent', width: '100%' }}>
@@ -159,18 +178,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 12 }}>
               <Button
-                type="primary"
-                icon={authed ? <LogoutOutlined /> : <LoginOutlined />}
-                onClick={() => (authed ? handleLogout() : navigate('/login'))}
-                style={{
-                  background: 'linear-gradient(45deg, #cba6f7, #89b4fa)',
-                  border: 'none',
-                  boxShadow: '0 2px 8px rgba(203, 166, 247, 0.3)',
-                }}
-              >
-                {authed ? 'Logout' : 'Login'}
-              </Button>
-              <Button
                 aria-label="Open menu"
                 icon={<MenuOutlined />}
                 onClick={() => setOpen(true)}
@@ -202,37 +209,44 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         onClose={() => setOpen(false)}
         placement="right"
         title={<span style={{ fontWeight: 700, color: '#cdd6f4' }}>Menu</span>}
+        width={isMobile ? 320 : 360}
+        maskStyle={{ backdropFilter: 'blur(2px)', backgroundColor: 'rgba(17,17,27,0.45)' }}
+        contentWrapperStyle={{
+          boxShadow: '0 8px 32px rgba(0,0,0,0.45)',
+          borderLeft: '1px solid #313244',
+        }}
         styles={{
           header: {
-            background: '#11111b',
+            background: 'linear-gradient(180deg, #11111b, #181825)',
             borderBottom: '1px solid #313244',
             padding: '12px 16px',
           },
-          body: { padding: 16 },
+          body: { padding: 16, background: 'linear-gradient(180deg, rgba(17,17,27,0.98), rgba(24,24,37,0.98))' },
         }}
         closeIcon={<span style={drawerCloseStyle}>×</span>}
       >
-        {/* Mobile menu: text-only, one item per row with gradient bold text */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <Typography.Link
+        {/* Mobile menu: gradient, iconed, pressable items */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <DrawerItem
+            icon={<HomeOutlined />}
+            label="Home"
             onClick={() => {
               navigate('/');
               setOpen(false);
             }}
-            style={drawerLinkStyle}
-          >
-            Home
-          </Typography.Link>
-          <Typography.Link
+          />
+          <DrawerItem
+            icon={<BookOutlined />}
+            label="Books"
             onClick={() => {
               navigate('/books');
               setOpen(false);
             }}
-            style={drawerLinkStyle}
-          >
-            Books
-          </Typography.Link>
-          <Typography.Link
+          />
+          <DrawerItem
+            icon={authed ? <LogoutOutlined /> : <LoginOutlined />}
+            label={authed ? 'Logout' : 'Login'}
+            danger={authed}
             onClick={() => {
               if (authed) {
                 handleLogout();
@@ -241,10 +255,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               }
               setOpen(false);
             }}
-            style={drawerLinkStyle}
-          >
-            {authed ? 'Logout' : 'Login'}
-          </Typography.Link>
+          />
         </div>
       </Drawer>
     </Layout>

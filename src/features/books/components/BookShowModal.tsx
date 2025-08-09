@@ -8,11 +8,12 @@ interface BookShowModalProps {
   book: Book | null;
   loading?: boolean;
   canBorrow: boolean;
+  alreadyBorrowed?: boolean;
   onCancel: () => void;
   onBorrow: () => void;
 }
 
-export const BookShowModal: React.FC<BookShowModalProps> = ({ open, book, loading, canBorrow, onCancel, onBorrow }) => {
+export const BookShowModal: React.FC<BookShowModalProps> = ({ open, book, loading, canBorrow, alreadyBorrowed = false, onCancel, onBorrow }) => {
   const remaining = book ? Math.max(0, (book.total_copies ?? 0) - (book.borrowings_count ?? 0)) : 0;
   const color = remaining === 0 ? 'error' : remaining <= 2 ? 'warning' : 'success';
   const text = remaining === 0 ? 'Unavailable' : remaining <= 2 ? 'Low stock' : 'Available';
@@ -25,7 +26,9 @@ export const BookShowModal: React.FC<BookShowModalProps> = ({ open, book, loadin
       footer={[
         <Button key="cancel" onClick={onCancel}>Close</Button>,
         ...(canBorrow ? [
-          <Button key="borrow" type="primary" onClick={onBorrow} loading={loading} disabled={remaining <= 0}>Borrow</Button>
+          <Button key="borrow" type="primary" onClick={onBorrow} loading={loading} disabled={remaining <= 0 || alreadyBorrowed}>
+            {alreadyBorrowed ? 'Already Borrowed' : 'Borrow'}
+          </Button>
         ] : []),
       ]}
     >

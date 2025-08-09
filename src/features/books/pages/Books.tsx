@@ -16,6 +16,8 @@ import { BookDeleteConfirmModal } from '../components/BookDeleteConfirmModal';
 import { BookEditModal } from '../components/BookEditModal';
 import { AnimatedDiv, Pressable } from '../../../components/Animated';
 import { Link } from 'react-router-dom';
+import type { MemberDashboard, MemberBorrowRecord } from '../../home/types/dashboard';
+import { useGetMemberDashboard } from '../../home/useCases/useGetMemberDashboard';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -34,11 +36,21 @@ const Books: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Book | null>(null);
   const [borrowLoading, setBorrowLoading] = useState(false);
-
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Book | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Book | null>(null);
   const [saving, setSaving] = useState(false);
+  const [myActive, setMyActive] = useState<MemberBorrowRecord[] | null>(null);
+
+  useEffect(() => {
+    if (isLoggedIn() && !isLibrarian()) {
+      useGetMemberDashboard()
+        .then((d: MemberDashboard) => {
+          if (Array.isArray(d.active)) setMyActive(d.active);
+        })
+        .catch(() => {/* ignore */});
+    }
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -89,13 +101,28 @@ const Books: React.FC = () => {
           width: 56,
           render: (_: unknown, r: Book) => {
             const items: MenuProps['items'] = [
-              { key: 'edit', label: 'Edit', onClick: () => setEditTarget(r) },
+              { key: 'edit', label: 'Edit' },
               { type: 'divider' as const },
-              { key: 'delete', label: <span style={{ color: '#f38ba8' }}>Delete</span>, onClick: () => setDeleteTarget(r) },
+              { key: 'delete', label: <span style={{ color: '#f38ba8' }}>Delete</span> },
             ];
             return (
-              <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
-                <Button type="text" icon={<MoreOutlined />} />
+              <Dropdown
+                menu={{
+                  items,
+                  onClick: ({ key, domEvent }) => {
+                    domEvent.stopPropagation();
+                    if (key === 'edit') setEditTarget(r);
+                    if (key === 'delete') setDeleteTarget(r);
+                  },
+                }}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <Button
+                  type="text"
+                  icon={<MoreOutlined />}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                />
               </Dropdown>
             );
           },
@@ -180,6 +207,8 @@ const Books: React.FC = () => {
     }
   };
 
+  const alreadyBorrowed = !!(selected && myActive?.some((r) => String(r.book?.id) === String(selected.id) && !r.returned_at));
+
   return (
     <section style={{ padding: 24, maxWidth: 1200, margin: '0 auto', width: '100%' }}>
       <Space direction="vertical" size={16} style={{ width: '100%' }}>
@@ -246,6 +275,7 @@ const Books: React.FC = () => {
         book={selected}
         loading={borrowLoading}
         canBorrow={isLoggedIn()}
+        alreadyBorrowed={alreadyBorrowed}
         onCancel={() => setSelected(null)}
         onBorrow={handleBorrow}
       />
