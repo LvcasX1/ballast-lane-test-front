@@ -13,8 +13,9 @@ export const useLogin = async (email: string, password: string) => {
 
   if ("auth_token" in resp.data) {
     const auth_token = resp.data.auth_token as string;
-    console.log('Login successful, token:', auth_token);
-    login(auth_token);
+    const role = (resp.data?.user?.role || resp.data?.role) as 'librarian' | 'member' | undefined;
+    console.log('Login successful, token:', auth_token, 'role:', role);
+    login(auth_token, role);
   }
 
   return resp.status;

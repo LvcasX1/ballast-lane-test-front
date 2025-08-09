@@ -1,6 +1,7 @@
 import { setHeaders, resetHeaders } from './fetcher';
 
 const TOKEN_KEY = 'app.auth.token';
+const ROLE_KEY = 'app.auth.role';
 const AUTH_EVENT = 'auth:changed';
 
 export const getToken = (): string | null => {
@@ -12,18 +13,42 @@ export const getToken = (): string | null => {
   }
 };
 
-export const isLoggedIn = (): boolean => !!getToken();
+export type UserRole = 'librarian' | 'member';
 
-export const login = (token: string) => {
+export const getRole = (): UserRole | null => {
+  try {
+    const token = getToken();
+    if (!token) {
+      try { sessionStorage.removeItem(ROLE_KEY); } catch {}
+      return null;
+    }
+    const raw = sessionStorage.getItem(ROLE_KEY);
+    return raw ? (JSON.parse(raw) as UserRole) : null;
+  } catch {
+    return null;
+  }
+};
+
+export const isLoggedIn = (): boolean => !!getToken();
+export const isLibrarian = (): boolean => !!getToken() && getRole() === 'librarian';
+
+export const setRole = (role: UserRole) => {
+  sessionStorage.setItem(ROLE_KEY, JSON.stringify(role));
+  window.dispatchEvent(new Event(AUTH_EVENT));
+};
+
+export const login = (token: string, role?: UserRole) => {
   sessionStorage.setItem(TOKEN_KEY, JSON.stringify(token));
+  if (role) sessionStorage.setItem(ROLE_KEY, JSON.stringify(role));
   setHeaders(token);
   window.dispatchEvent(new Event(AUTH_EVENT));
 };
 
 export const logout = () => {
-  // Remove token from all possible places to avoid mismatches
-  try { sessionStorage.removeItem("app.auth.token"); } catch {}
-  try { localStorage.removeItem("app.auth.token"); } catch {}
+  try { sessionStorage.removeItem(TOKEN_KEY); } catch {}
+  try { localStorage.removeItem(TOKEN_KEY); } catch {}
+  try { sessionStorage.removeItem(ROLE_KEY); } catch {}
+  try { localStorage.removeItem(ROLE_KEY); } catch {}
 
   resetHeaders();
   window.dispatchEvent(new Event(AUTH_EVENT));
@@ -38,3 +63,10 @@ export const subscribe = (cb: () => void) => {
     window.removeEventListener('storage', handler);
   };
 };
+
+try {
+  const hasToken = !!sessionStorage.getItem(TOKEN_KEY);
+  if (!hasToken) {
+    sessionStorage.removeItem(ROLE_KEY);
+  }
+} catch {}

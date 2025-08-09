@@ -3,6 +3,7 @@ import { Card, Typography, Input, Button, Space, Form, message } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useSignUp } from '../useCases/useSignUp';
+import { AnimatedDiv, Pressable } from '../../../components/Animated';
 
 const { Title } = Typography;
 
@@ -32,46 +33,52 @@ const SignUp: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
-      <Card style={{ width: '100%', maxWidth: 480 }}>
-        <Space direction="vertical" style={{ width: '100%' }} size="large">
-          <Title level={3} style={{ textAlign: 'center', margin: 0 }}>Sign Up</Title>
-          <Form layout="vertical" onFinish={onFinish}>
-            <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please enter your name' }]}>
-              <Input prefix={<UserOutlined />} placeholder="John Doe" />
-            </Form.Item>
-            <Form.Item name="email_address" label="Email" rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}>
-              <Input prefix={<MailOutlined />} placeholder="john.doe@example.com" />
-            </Form.Item>
-            <Form.Item name="password" label="Password" rules={[{ required: true, min: 6 }]}>
-              <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
-            </Form.Item>
-            <Form.Item
-              name="password_confirmation"
-              label="Confirm Password"
-              dependencies={["password"]}
-              rules={[
-                { required: true, message: 'Please confirm your password' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Passwords do not match'));
-                  },
-                }),
-              ]}
-            >
-              <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
-            </Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>
-              Create account
-            </Button>
-            <Button type="link" block onClick={() => navigate('/login')}>
-              Already have an account? Sign in
-            </Button>
-          </Form>
-        </Space>
-      </Card>
+      <AnimatedDiv>
+        <Card style={{ width: '100%', maxWidth: 480 }}>
+          <Space direction="vertical" style={{ width: '100%' }} size="large">
+            <Title level={3} style={{ textAlign: 'center', margin: 0 }}>Sign Up</Title>
+            <Form layout="vertical" onFinish={onFinish}>
+              <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please enter your name' }]}>
+                <Input prefix={<UserOutlined />} placeholder="John Doe" />
+              </Form.Item>
+              <Form.Item name="email_address" label="Email" rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}>
+                <Input prefix={<MailOutlined />} placeholder="john.doe@example.com" />
+              </Form.Item>
+              <Form.Item name="password" label="Password" rules={[{ required: true, min: 6 }]}>
+                <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
+              </Form.Item>
+              <Form.Item
+                name="password_confirmation"
+                label="Confirm Password"
+                dependencies={["password"]}
+                rules={[
+                  { required: true, message: 'Please confirm your password' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Passwords do not match'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
+              </Form.Item>
+              <Pressable>
+                <Button type="primary" htmlType="submit" loading={loading} block>
+                  Create account
+                </Button>
+              </Pressable>
+              <Pressable>
+                <Button type="link" block onClick={() => navigate('/login')}>
+                  Already have an account? Sign in
+                </Button>
+              </Pressable>
+            </Form>
+          </Space>
+        </Card>
+      </AnimatedDiv>
     </div>
   );
 };

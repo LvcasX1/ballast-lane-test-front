@@ -20,6 +20,7 @@ fetcher.interceptors.response.use(
     const status = error?.response?.status
     if (status === 401 || status === 403) {
       try { sessionStorage.removeItem('app.auth.token') } catch {}
+      try { sessionStorage.removeItem('app.auth.role') } catch {}
       resetHeaders()
       const path = window.location.pathname
 
@@ -35,11 +36,13 @@ fetcher.interceptors.response.use(
 )
 
 export const setHeaders = (token: string) => {
-  fetcher.defaults.headers.common['token'] = token
-  fetcherRawResponse.defaults.headers.common['token'] = token
+  fetcher.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  fetcherRawResponse.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }
 
 export const resetHeaders = () => {
+  delete fetcher.defaults.headers.common['Authorization']
+  delete fetcherRawResponse.defaults.headers.common['Authorization']
   delete fetcher.defaults.headers.common['token']
   delete fetcherRawResponse.defaults.headers.common['token']
 }

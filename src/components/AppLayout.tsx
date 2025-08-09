@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Button, Drawer, Grid, message } from 'antd';
-import { HomeOutlined, AppstoreOutlined, MenuOutlined, LogoutOutlined, LoginOutlined } from '@ant-design/icons';
+import { HomeOutlined, MenuOutlined, LogoutOutlined, LoginOutlined, BookOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { isLoggedIn, subscribe, logout } from '../utils/auth';
 import { useLogout } from '../features/login/useCases/useLogout';
@@ -57,9 +57,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         Home
       </Button>
       <Button
-        icon={<AppstoreOutlined />}
+        icon={<BookOutlined />}
         onClick={() => {
-          navigate('/app');
+          navigate('/books');
           setOpen(false);
         }}
         style={{
@@ -70,8 +70,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         }}
         type="primary"
       >
-        App Demo
+        Books
       </Button>
+      {/* Removed App Demo button from header */}
     </div>
   );
 
@@ -85,17 +86,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     textDecoration: 'none',
     display: 'block',
     padding: '8px 0',
-  };
-
-  const headerControlTextStyle: React.CSSProperties = {
-    fontSize: 16,
-    fontWeight: 700,
-    background: 'linear-gradient(45deg, #cba6f7, #89b4fa)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    textDecoration: 'none',
-    cursor: 'pointer',
   };
 
   const drawerCloseStyle: React.CSSProperties = {
@@ -151,12 +141,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
           {/* Right controls */}
           {!isMobile && (
-            <Typography.Link
+            <Button
+              type="primary"
+              icon={authed ? <LogoutOutlined /> : <LoginOutlined />}
               onClick={() => (authed ? handleLogout() : navigate('/login'))}
-              style={{ ...headerControlTextStyle, marginRight: 24 }}
+              style={{
+                background: 'linear-gradient(45deg, #cba6f7, #89b4fa)',
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(203, 166, 247, 0.3)',
+                marginRight: 24,
+              }}
             >
               {authed ? 'Logout' : 'Login'}
-            </Typography.Link>
+            </Button>
           )}
 
           {isMobile && (
@@ -228,12 +225,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           </Typography.Link>
           <Typography.Link
             onClick={() => {
-              navigate('/app');
+              navigate('/books');
               setOpen(false);
             }}
             style={drawerLinkStyle}
           >
-            App Demo
+            Books
           </Typography.Link>
           <Typography.Link
             onClick={() => {
