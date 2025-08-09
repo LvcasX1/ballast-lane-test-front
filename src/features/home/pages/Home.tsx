@@ -105,7 +105,7 @@ const Home: React.FC = () => {
       ) : (
         <>
           <Paragraph style={{ color: '#bac2de', marginTop: 8 }}>
-            A soothing pastel theme for your React + Ant Design app.
+            Discover, borrow, and track your favorite books.
           </Paragraph>
           <div style={{ width: '100%', maxWidth: 1200, marginTop: 24 }}>
             {librarian ? <LibrarianDashboardView /> : <MemberDashboardView />}
