@@ -2,6 +2,8 @@ export interface OverdueBookItem {
   book_id: string | number;
   title: string;
   due_date: string; // ISO
+  // Optional borrowing identifier (provided by backend) used for return action
+  borrowing_id?: string | number;
 }
 
 export interface OverdueMember {
@@ -34,6 +36,16 @@ export interface MemberBorrowRecord {
     title: string;
     author: string;
   };
+  borrowed_at: string; // ISO
+  due_date: string; // ISO
+  returned_at: string | null;
+}
+
+// Updated to match /borrowings/current API
+export interface ActiveBorrowingItem {
+  id: string | number;
+  user_name: string;
+  book_title: string;
   borrowed_at: string; // ISO
   due_date: string; // ISO
   returned_at: string | null;
